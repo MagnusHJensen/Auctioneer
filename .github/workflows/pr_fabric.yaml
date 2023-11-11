@@ -23,7 +23,7 @@ jobs:
           uses: gradle/gradle-build-action@v2
         - name: Run build with Gradle wrapper
           id: gradle
-          run: ./gradlew :Fabric:build --scan
+          run: gradle wrapper && ./gradlew :Fabric:build --scan
         - name: Add build scan URL as PR comment
           uses: actions/github-script@v5
           if: github.event_name == 'pull_request' && failure()
