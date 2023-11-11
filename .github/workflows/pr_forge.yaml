@@ -25,7 +25,7 @@ jobs:
           gradle-version: 7.4.2
       - name: Run build with Gradle wrapper
         id: gradle
-        run: ./gradlew :Forge:build --scan
+        run: gradle wrapper && ./gradlew :Forge:build --scan
       - name: Add build scan URL as PR comment
         uses: actions/github-script@v5
         if: github.event_name == 'pull_request' && failure()
