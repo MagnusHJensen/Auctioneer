@@ -1,0 +1,38 @@
+name: "CI / Fabric"
+on:
+  pull_request:
+    branches:
+      - 'release/**'
+    paths:
+      - 'Common/**'
+      - 'CommonApi/**'
+      - 'Fabric/**'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+        - name: Setup Java
+          uses: actions/setup-java@v3
+          with:
+            distribution: temurin
+            java-version: 17
+        - name: Setup gradle
+          uses: gradle/gradle-build-action@v2
+        - name: Run build with Gradle wrapper
+          id: gradle
+          run: ./gradlew :Fabric:build --scan
+        - name: Add build scan URL as PR comment
+          uses: actions/github-script@v5
+          if: github.event_name == 'pull_request' && failure()
+          with:
+            github-token: ${{secrets.GITHUB_TOKEN}}
+            script: |
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '❌ ${{ github.workflow }} failed: ${{ steps.gradle.outputs.build-scan-url }}'
+              })
